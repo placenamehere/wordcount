@@ -1,0 +1,146 @@
+/*
+ *  jQuery Wordcount - v0.5
+ *  A jQuery plugin for counting words of form field values (based on my textcount plugin)
+ *  https://github.com/placenamehere/wordcount
+ *
+ *  Made by Chris Casciano
+ *  Under MIT License
+ */
+// the semi-colon before function invocation is a safety net against concatenated
+// scripts and/or other plugins which may not be closed properly.
+;(function ( $, window, document, undefined ) {
+
+    // undefined is used here as the undefined global variable in ECMAScript 3 is
+    // mutable (ie. it can be changed by someone else). undefined isn't really being
+    // passed in so we can ensure the value of it is truly undefined. In ES5, undefined
+    // can no longer be modified.
+
+    // window and document are passed through as local variable rather than global
+    // as this (slightly) quickens the resolution process and can be more efficiently
+    // minified (especially when both are regularly referenced in your plugin).
+
+    // Create the defaults once
+    var pluginName = "wordcount",
+        defaults = {
+          prefix: "wc",
+          triggerEvent: "keyup"
+        };
+
+    // The actual plugin constructor
+    function Plugin ( element, options ) {
+        this.element = element;
+        // jQuery has an extend method which merges the contents of two or
+        // more objects, storing the result in the first object. The first object
+        // is generally empty as we don't want to alter the default options for
+        // future instances of the plugin
+        this.options = $.extend( {}, defaults, options );
+        this._defaults = defaults;
+        this._name = pluginName;
+        this.init();
+    }
+
+    Plugin.prototype = {
+        init: function () {
+            // Place initialization logic here
+            // You already have access to the DOM element and
+            // the options via the instance, e.g. this.element
+            // and this.options
+            // you can add more functions like the one below and
+            // call them like so: this.yourOtherFunction(this.element, this.options).
+
+
+            var _this = this,
+                $el = $(_this.element),
+                $next = $el.next(),
+                $hint,
+                maxWords = $el.data(_this.options.prefix+"-max-words"),
+                val,
+                c = 0,
+                err = false;
+
+            // STEP 1: Draw hint box
+            if ($next && $next.is("."+_this.options.prefix+"-hint")) {
+              $hint = $next;
+            } else {
+              $hint = $("<span class='"+_this.options.prefix+"-hint'></span>").insertAfter($el);
+            }
+
+            // STEP 2: Do initial field evaluation
+            val = $el.val() ? $el.val().trim() : "";
+            if (val.length) {
+              c = val.match(/\S+/g).length;
+            }
+
+            if (maxWords) {
+              // countint words w/ limit
+              if (c > maxWords) {
+                err = true;
+              }
+
+              if (err) {
+                $hint.addClass(_this.options.prefix+"-error")
+                    .html((maxWords - c) + " over limit of " + maxWords + "words");
+              } else {
+                $hint.removeClass(_this.options.prefix+"-error")
+                    .html((maxWords - c) + " words remaining of " + maxWords);
+              }
+            } else {
+              // counting words w/o limit
+              $hint.html(c + " total words");
+            }
+
+            // STEP 4: Watch for changes
+            $el.on(_this.options.triggerEvent,function(){
+              var $el = $(this),
+                  $hint = $el.next("."+_this.options.prefix+"-hint"),
+                  maxWords = $el.data(_this.options.prefix+"-max-words"),
+                  val,
+                  c = 0,
+                  err = false;
+
+              // STEP 5: repeat field evaluation
+              val = $el.val() ? $el.val().trim() : "";
+              if (val.length) {
+                c = val.match(/\S+/g).length;
+              }
+
+              if (maxWords) {
+                // countint words w/ limit
+                if (c > maxWords) {
+                  err = true;
+                }
+
+                if (err) {
+                  $hint.addClass(_this.options.prefix+"-error")
+                      .html((c - maxWords) + " over limit of " + maxWords + " words");
+                } else {
+                  $hint.removeClass(_this.options.prefix+"-error")
+                      .html((maxWords - c) + " words remaining of " + maxWords);
+                }
+              } else {
+                // counting words w/o limit
+                $hint.html(c + " total words");
+              }
+
+              if (err) {
+                $hint.addClass(_this.options.prefix+"-error");
+              } else {
+                $hint.removeClass(_this.options.prefix+"-error");
+              }
+
+            });
+
+        }
+    };
+
+    // A really lightweight plugin wrapper around the constructor,
+    // preventing against multiple instantiations
+    $.fn[ pluginName ] = function ( options ) {
+        return this.each(function() {
+            if ( !$.data( this, "plugin_" + pluginName ) ) {
+                $.data( this, "plugin_" + pluginName, new Plugin( this, options ) );
+            }
+        });
+    };
+
+})( jQuery, window, document );
