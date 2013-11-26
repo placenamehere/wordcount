@@ -58,7 +58,10 @@
             }
 
             // STEP 2: Do initial field evaluation
-            val = $el.val() ? $el.val().trim() : "";
+            val = $el.val() ? $el.val() : "";
+            // NOTE: no trim in IE8
+            val = val.replace(/^\s+|\s+$/g, "");
+
             if (val.length) {
               c = val.match(/\S+/g).length;
             }
@@ -91,7 +94,10 @@
                   err = false;
 
               // STEP 5: repeat field evaluation
-              val = $el.val() ? $el.val().trim() : "";
+              val = $el.val() ? $el.val() : "";
+              // NOTE: no trim in IE8
+              val = val.replace(/^\s+|\s+$/g, "");
+
               if (val.length) {
                 c = val.match(/\S+/g).length;
               }
