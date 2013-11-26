@@ -79,14 +79,14 @@
 
               if (err) {
                 $hint.addClass(_this.options.prefix+"-error")
-                    .html((maxWords - c) + " over limit of " + maxWords + "words");
+                    .html((c - maxWords) + " words over limit of " + maxWords);
               } else {
                 $hint.removeClass(_this.options.prefix+"-error")
-                    .html((maxWords - c) + " words remaining of " + maxWords);
+                    .html((maxWords - c) + " words remaining (limit = " + maxWords + ")");
               }
             } else {
               // counting words w/o limit
-              $hint.html(c + " total words");
+              $hint.html(c + " words");
             }
 
             // STEP 4: Watch for changes
@@ -112,14 +112,14 @@
 
                 if (err) {
                   $hint.addClass(_this.options.prefix+"-error")
-                      .html((c - maxWords) + " over limit of " + maxWords + " words");
+                      .html((c - maxWords) + " words over limit of " + maxWords);
                 } else {
                   $hint.removeClass(_this.options.prefix+"-error")
-                      .html((maxWords - c) + " words remaining of " + maxWords);
+                      .html((maxWords - c) + " words remaining (limit = " + maxWords + ")");
                 }
               } else {
                 // counting words w/o limit
-                $hint.html(c + " total words");
+                $hint.html(c + " words");
               }
 
               if (err) {
